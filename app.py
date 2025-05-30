@@ -6,7 +6,7 @@ import docx
 
 
 # Page configuration
-st.set_page_config(page_title="Gemini RAG Assistant", layout="wide", page_icon="💬")
+st.set_page_config(page_title="Gemini RAG Assistant", layout="wide", page_icon="✨")
 
 
 # Initialize session state
@@ -89,7 +89,7 @@ def embed_texts(texts):
     try:
         # Try batch embedding first
         result = genai.embed_content(
-            model=EMBEDDING_MODEL, content=texts, task_type="retrieval_document"
+            model=EMBEDDING_MODEL, content=texts, task_type="semantic_similarity"
         )
         embeddings = result["embedding"]
         successful_indices = list(range(len(texts)))
@@ -100,7 +100,7 @@ def embed_texts(texts):
         for i, text in enumerate(texts):
             try:
                 result = genai.embed_content(
-                    model=EMBEDDING_MODEL, content=text, task_type="retrieval_document"
+                    model=EMBEDDING_MODEL, content=text, task_type="semantic_similarity"
                 )
                 embeddings[i] = result["embedding"]
                 successful_indices.append(i)
@@ -112,7 +112,7 @@ def embed_texts(texts):
 
 def build_prompt(query, contexts):
     """Build prompt for chat."""
-    prompt = "You are a helpful AI assistant. Answer the user's question based on the provided context.\n\n"
+    prompt = "You are a helpful AI assistant. Answer the user's question based on the retrieved context.\n\n"
 
     if contexts:
         prompt += "Context:\n"
@@ -419,51 +419,47 @@ else:
                                 )
                                 response = chat_model.generate_content(prompt_text)
                                 response_text = response.text
+
+                                # Display the assistant's response
+                                st.write(response_text)
+
+                                # Save to chat history
+                                st.session_state.chat_history.append(
+                                    {
+                                        "query": prompt,
+                                        "response": response_text,
+                                        "contexts": contexts,
+                                        "context_sources": context_sources,
+                                    }
+                                )
                             else:
-                                response_text = "I couldn't find relevant information in the selected documents to answer your question."
-                                contexts = []
-                                context_sources = []
+                                st.write(
+                                    "No relevant context found in selected documents."
+                                )
+                                st.session_state.chat_history.append(
+                                    {
+                                        "query": prompt,
+                                        "response": "Sorry, I couldn't find relevant information in the selected documents.",
+                                        "contexts": [],
+                                        "context_sources": [],
+                                    }
+                                )
                         else:
-                            response_text = "Error: Failed to process your query."
-                            contexts = []
-                            context_sources = []
-
-                        # Display response
-                        st.write(response_text)
-
-                        # Show context if available
-                        if contexts:
-                            with st.expander("View Sources"):
-                                for i, (context, source) in enumerate(
-                                    zip(contexts, context_sources)
-                                ):
-                                    st.write(f"**Source {i + 1}: {source}**")
-                                    st.write(
-                                        context[:300] + "..."
-                                        if len(context) > 300
-                                        else context
-                                    )
-                                    st.divider()
-
-                        # Add to chat history
-                        st.session_state.chat_history.append(
-                            {
-                                "query": prompt,
-                                "response": response_text,
-                                "contexts": contexts,
-                                "context_sources": context_sources,
-                            }
-                        )
-
+                            st.write("Failed to generate embedding for the query.")
+                            st.session_state.chat_history.append(
+                                {
+                                    "query": prompt,
+                                    "response": "Sorry, I couldn't process your query due to an embedding issue.",
+                                    "contexts": [],
+                                    "context_sources": [],
+                                }
+                            )
                     except Exception as e:
-                        error_msg = f"Error processing your question: {str(e)}"
-                        st.error(error_msg)
-
-                        # Add error to chat history
+                        st.error(f"Unexpected error: {e}")
                         st.session_state.chat_history.append(
                             {
                                 "query": prompt,
-                                "response": error_msg,
+                                "response": f"An error occurred while processing your query: {e}",
                                 "contexts": [],
                                 "context_sources": [],
                             }
