@@ -3,8 +3,7 @@ import fitz  # PyMuPDF
 import google.generativeai as genai
 import chromadb
 import docx
-from datetime import datetime
-import time
+
 
 # Page configuration
 st.set_page_config(page_title="Gemini RAG Assistant", layout="wide", page_icon="💬")
@@ -380,11 +379,11 @@ else:
         # Chat input
         if prompt := st.chat_input("Ask a question about your documents..."):
             # Add user message to chat history immediately
-            timestamp = datetime.now().strftime("%H:%M:%S")
+            # timestamp = datetime.now().strftime("%H:%M:%S")
 
             # Display user message
             with st.chat_message("user"):
-                st.write(f"**{timestamp}**")
+                # st.write(f"**{timestamp}**")
                 st.write(prompt)
 
             # Process query
@@ -454,7 +453,6 @@ else:
                                 "response": response_text,
                                 "contexts": contexts,
                                 "context_sources": context_sources,
-                                "timestamp": timestamp,
                             }
                         )
 
@@ -469,6 +467,5 @@ else:
                                 "response": error_msg,
                                 "contexts": [],
                                 "context_sources": [],
-                                "timestamp": timestamp,
                             }
                         )
