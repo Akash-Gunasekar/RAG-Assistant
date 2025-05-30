@@ -357,7 +357,6 @@ else:
         for chat in st.session_state.chat_history:
             # User message
             with st.chat_message("user"):
-                st.write(f"**{chat['timestamp']}**")
                 st.write(chat["query"])
 
             # Assistant message
