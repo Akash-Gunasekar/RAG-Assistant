@@ -44,7 +44,7 @@ The app opens in your browser.
 5. Clear Chat History
    Clear previous conversations to start fresh.
 
-File Formats Supported
+# File Formats Supported
 * PDF (.pdf)
 * Microsoft Word (.docx)
 * Plain Text (.txt)
