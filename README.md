@@ -66,3 +66,11 @@ The app opens in your browser.
 2. Add user authentication and document access control.
 3. Enhance chunking algorithm with NLP sentence segmentation.
 4. Support multi-turn conversation context.
+   
+
+**Made with ❤️ by Akash Gunasekar**
+
+_Star ⭐ this repo if it helped you build something awesome!_
+
+
+
